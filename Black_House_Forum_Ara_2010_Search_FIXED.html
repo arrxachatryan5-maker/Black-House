@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Black House — Форум</title>
+<style>
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:#0b0d11;color:#f4f4f5;font-family:Arial,sans-serif}
+.wrap{width:min(1050px,calc(100% - 28px));margin:auto}
+header{background:#151820;border-bottom:1px solid #2b2f38}
+.top{padding:24px 0}.logo{font-size:30px;font-weight:900;letter-spacing:2px}.logo span{color:#e53935}
+.sub{color:#9da3ad;margin-top:7px}
+nav{display:flex;flex-wrap:wrap;gap:8px;padding:0 0 18px}
+nav a,.profileBtn{border:0;background:#22262f;color:#eee;padding:10px 13px;border-radius:8px;text-decoration:none;font-size:14px;cursor:pointer}
+nav a:hover,.profileBtn:hover{background:#e53935}
+.hero{padding:32px 0}.hero h1{font-size:36px;margin:0 0 10px}.hero p{color:#aeb3bc;line-height:1.6}
+.notice{background:#191c23;border-left:4px solid #e53935;padding:14px;margin:18px 0;color:#d7d9de;border-radius:5px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:15px}
+.card,.section{background:linear-gradient(145deg,#171b23,#12151b);border:1px solid #303540;border-radius:15px;box-shadow:0 8px 25px rgba(0,0,0,.16)}
+.card{padding:21px;transition:transform .15s,border-color .15s}.card:hover{transform:translateY(-2px);border-color:#4a4f5b}.card h2{margin:0 0 8px;font-size:19px}.card p{color:#aeb3bc;line-height:1.5}.btn{display:inline-block;background:#e53935;color:#fff;padding:10px 15px;border-radius:8px;font-weight:700}.btn:hover{background:#f04440}.btn{border:0;cursor:pointer;font:inherit}
+.section{padding:24px;margin-top:16px}#home>.section{display:none}.detailsPage{display:none;position:fixed;inset:0;z-index:20;background:#0b0d11;overflow:auto}.detailsInner{width:min(1050px,calc(100% - 28px));margin:auto;padding:20px 0 45px}.detailsPage .section{display:block;margin-top:0}.backBtn{border:0;background:#252a33;color:#fff;padding:11px 16px;border-radius:9px;font-size:15px;cursor:pointer;margin-bottom:15px}.backBtn:hover{background:#e53935}.section h2{margin-top:0}.section h3{margin-top:24px}.section li,.section p{color:#c9cdd4;line-height:1.65}
+.edit{margin-top:22px;padding-top:12px;border-top:1px dashed #383c46;color:#777;font-size:12px}
+footer{text-align:center;color:#777;padding:35px 0}
+.adminOnly{display:none}.adminPanel{margin-top:16px}.userRow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #2b2f38}.userDot{width:28px;height:28px;border-radius:50%;border:2px solid #444}.userRow input{flex:1;min-width:0}.colorInput{width:48px;height:40px;padding:2px}.smallBtn{border:0;border-radius:7px;padding:8px 10px;background:#2b2f38;color:#fff;cursor:pointer}.smallBtn.red{background:#e53935}.searchBox{display:flex;gap:10px;margin:15px 0;flex-wrap:wrap}.searchBox input{flex:1;min-width:200px;padding:12px;background:#0e1014;border:1px solid #343943;color:#fff;border-radius:8px;font:inherit}.searchResults{display:grid;gap:10px;margin-top:15px}.playerResult{display:flex;align-items:center;gap:12px;padding:12px;background:#151820;border:1px solid #303540;border-radius:12px}.playerResult img,.playerAvatarFallback{width:52px;height:52px;border-radius:50%;object-fit:cover;flex:none}.playerAvatarFallback{display:flex;align-items:center;justify-content:center;background:#252932;font-size:25px}.playerResult .playerInfo{min-width:0}.playerResult .playerName{font-weight:800;font-size:17px}.playerResult .playerAbout{color:#aaa;font-size:14px;margin-top:3px}.emptySearch{color:#888;padding:10px 0}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);align-items:center;justify-content:center;padding:15px;z-index:10}
+.box{width:min(450px,100%);background:#171a21;border:1px solid #343943;border-radius:14px;padding:22px}
+.box h2{margin-top:0}.field{margin:14px 0}.field label{display:block;color:#aaa;margin-bottom:6px}
+.field input,.field textarea{width:100%;padding:11px;background:#0e1014;border:1px solid #343943;color:#fff;border-radius:8px;font:inherit}
+.field textarea{min-height:90px}.preview{display:block;width:85px;height:85px;border-radius:50%;object-fit:cover;margin:10px auto}
+.actions{display:flex;gap:9px;justify-content:flex-end}.actions button{border:0;padding:10px 15px;border-radius:8px;cursor:pointer}.save{background:#e53935;color:#fff}.cancel{background:#2b2f38;color:#fff}
+.profile{display:none;margin:0 0 16px;padding:18px;background:#151820;border:1px solid #2b2f38;border-radius:12px;align-items:center;gap:15px}
+.profile.show{display:flex}.profile img{width:70px;height:70px;border-radius:50%;object-fit:cover}.profile h3{margin:0 0 5px}.profile p{margin:0;color:#aaa}
+@media(max-width:600px){.hero h1{font-size:28px}.logo{font-size:25px}.avatarCorner{width:46px;height:46px}.sub{font-size:14px;line-height:1.35}}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:15px}
+.brandArea{display:flex;align-items:center;gap:13px;min-width:0}
+.avatarCorner{width:52px;height:52px;border-radius:50%;background:#242933;border:2px solid #3a3f4b;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;flex:none}
+.avatarCorner img{width:100%;height:100%;object-fit:cover}.avatarCorner span{font-size:25px}
+.hamb{display:none;order:-1;border:0;background:#22262f;color:#fff;font-size:27px;width:48px;height:44px;border-radius:9px;cursor:pointer}.searchTop{border:0;background:#22262f;color:#fff;font-size:25px;width:48px;height:44px;border-radius:9px;cursor:pointer}.searchTop:hover{background:#e53935}
+.menu{display:block}
+@media(max-width:650px){
+  .hamb{display:block}
+  .menu{display:none;padding-bottom:12px}
+  .menu.open{display:block}
+  nav{display:flex;flex-direction:column;padding:0}
+  nav a,.profileBtn{width:100%;text-align:left;padding:13px 15px;font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<header>
+<div class="wrap topbar">
+  <div class="brandArea">
+    <div class="avatarCorner" id="cornerAvatar" onclick="openProfile()" title="Мой профиль">
+      <span>👤</span>
+    </div>
+    <div>
+      <div class="logo">BLACK <span>HOUSE</span></div>
+      <div class="sub">Официальный информационный форум проекта</div>
+    </div>
+  </div>
+  <button class="hamb" onclick="toggleMenu()" aria-label="Меню">☰</button>
+  <button class="searchTop" onclick="openSection('searchPlayers')" aria-label="Поиск игроков" title="Поиск игроков">🔎</button>
+</div>
+<div class="wrap menu" id="mainMenu">
+<nav>
+<a href="#home" onclick="closeMenu()">Главная</a>
+<a href="#" onclick="openSection('rules');closeMenu();return false">Правила игры</a>
+<a href="#" onclick="openSection('discord');closeMenu();return false">Discord</a>
+<a href="#" onclick="openSection('admin');closeMenu();return false">Администрация</a>
+<a href="#" onclick="openSection('complaints');closeMenu();return false">Жалобы</a>
+<a href="#" onclick="openSection('ideas');closeMenu();return false">Предложения</a>
+<a href="#" onclick="openSection('faq');closeMenu();return false">FAQ</a>
+<button class="profileBtn" onclick="openProfile();closeMenu()">👤 Мой профиль</button>
+<button class="profileBtn" id="ownerLoginBtn" onclick="openAdmin();closeMenu()">🔐 Вход владельца</button>
+</nav>
+</div>
+</header>
+
+<main class="wrap" id="home">
+<section class="hero">
+<h1>Добро пожаловать в Black House</h1>
+<p>Здесь собрана информация о проекте, правила, новости и полезные инструкции для игроков.</p>
+
+</section>
+
+<section class="profile" id="profile">
+<img id="pImg" alt=""><div><h3 id="pName"></h3><p id="pAbout"></p></div>
+</section>
+
+<section class="grid">
+<div class="card"><h2>📜 Правила игры</h2><p>Основные правила поведения игроков и RP.</p><button class="btn" onclick="openSection('rules')">Открыть</button></div>
+<div class="card"><h2>💬 Правила Discord</h2><p>Правила общения и поведения на сервере.</p><button class="btn" onclick="openSection('discord')">Открыть</button></div>
+<div class="card"><h2>👮 Администрация</h2><p>Обязанности и ограничения администрации.</p><button class="btn" onclick="openSection('admin')">Открыть</button></div>
+<div class="card"><h2>📝 Жалобы</h2><p>Как правильно подать жалобу.</p><button class="btn" onclick="openSection('complaints')">Открыть</button></div>
+<div class="card"><h2>💡 Предложения</h2><p>Предлагайте идеи для развития проекта.</p><button class="btn" onclick="openSection('ideas')">Открыть</button></div>
+<div class="card"><h2>❓ FAQ</h2><p>Ответы на частые вопросы.</p><button class="btn" onclick="openSection('faq')">Открыть</button></div>
+</section>
+
+<section class="section" id="rules">
+<h2>📜 Правила игры Black House</h2>
+<p><b>Версия: 1.0</b></p>
+<h3>1. Общие правила</h3>
+<ol>
+<li>Уважайте игроков и администрацию.</li>
+<li>Запрещены оскорбления, травля и угрозы.</li>
+<li>Запрещено использовать читы и стороннее ПО для получения преимущества.</li>
+<li>Запрещено намеренно использовать баги.</li>
+<li>Запрещены мошенничество и обман игроков.</li>
+<li>Запрещено выдавать себя за администрацию.</li>
+<li>Решения администрации можно обжаловать по установленной форме.</li>
+</ol>
+<h3>2. RP-правила</h3>
+<ol>
+<li>Соблюдайте логику игрового мира.</li>
+<li>MetaGaming — использование информации из реальной жизни в игре.</li>
+<li>PowerGaming — получение нереалистичного преимущества за счёт возможностей персонажа.</li>
+<li>Не покидайте ситуацию только ради ухода от её последствий.</li>
+</ol>
+<h3>3. Наказания</h3>
+<p>В зависимости от нарушения может применяться предупреждение, мут, временная блокировка или постоянная блокировка.</p>
+<p class="edit-note">✏️ Здесь можно изменить правила, RP-термины и систему наказаний.</p>
+</section>
+
+<section class="section" id="discord">
+<h2>💬 Правила Discord</h2>
+<ol>
+<li>Уважайте всех участников.</li>
+<li>Запрещены спам и флуд.</li>
+<li>Не злоупотребляйте упоминаниями и командами.</li>
+<li>Не публикуйте запрещённый или неподходящий контент.</li>
+<li>Не публикуйте чужие личные данные.</li>
+<li>Не отправляйте подозрительные или вредоносные ссылки и файлы.</li>
+<li>Не мешайте другим участникам в голосовых каналах.</li>
+<li>Реклама разрешена только в разрешённых местах.</li>
+<li>Запрещено обходить выданные наказания.</li>
+</ol>
+<h3>Система наказаний</h3>
+<p>Предупреждение → мут → ограничение → временный бан → перманентный бан.</p>
+<p class="edit-note">✏️ Здесь можно изменить каналы, сроки и дополнительные правила.</p>
+</section>
+
+<section class="section" id="admin">
+<h2>👮 Правила администрации</h2>
+<h3>Обязанности</h3>
+<ul>
+<li>Помогать игрокам.</li>
+<li>Объективно рассматривать обращения и жалобы.</li>
+<li>Соблюдать правила проекта.</li>
+<li>Не использовать полномочия в личных целях.</li>
+<li>Сохранять нейтральность при рассмотрении конфликтов.</li>
+</ul>
+<h3>Ограничения</h3>
+<ul>
+<li>Запрещено выдавать наказания без основания.</li>
+<li>Запрещено разглашать служебную информацию.</li>
+<li>Запрещено использовать административные возможности для личной выгоды.</li>
+</ul>
+<p class="edit-note">✏️ Здесь можно добавить должности, требования, повышения и выговоры.</p>
+</section>
+
+<section class="section" id="complaints">
+<h2>📝 Жалобы</h2>
+<p>В жалобе укажите:</p>
+<ol>
+<li>Ваш никнейм.</li>
+<li>Никнейм нарушителя.</li>
+<li>Дата и время.</li>
+<li>Подробное описание ситуации.</li>
+<li>Доказательства.</li>
+</ol>
+<div class="notice">Пример: «Жалоба на игрока — Nick_Name»</div>
+<p class="edit-note">✏️ Здесь можно добавить срок подачи жалобы и ссылку на форму.</p>
+</section>
+
+<section class="section" id="ideas">
+<h2>💡 Предложения</h2>
+<p>Опишите идею, пользу от неё и пример реализации.</p>
+<ul>
+<li>Название предложения</li>
+<li>Описание</li>
+<li>Причина, почему это улучшит проект</li>
+<li>Пример реализации</li>
+</ul>
+<p class="edit-note">✏️ Здесь можно добавить свои требования к предложениям.</p>
+</section>
+
+
+<section class="section" id="searchPlayers">
+<h2>🔎 Поиск игроков</h2>
+<p>Введите никнейм, чтобы найти игрока.</p>
+<div class="searchBox">
+<input id="playerSearchInput" type="search" maxlength="30" placeholder="Например: God_Discover" oninput="searchPlayers()">
+<button class="btn" onclick="searchPlayers()">Найти</button>
+</div>
+<div id="searchResults" class="searchResults"><p class="emptySearch">Начните вводить никнейм.</p></div>
+</section>
+
+<section class="section" id="faq">
+<h2>❓ FAQ</h2>
+<h3>Как связаться с администрацией?</h3>
+<p>Используйте официальный Discord и каналы обращений.</p>
+<h3>Где смотреть новости?</h3>
+<p>В разделе новостей и официальных объявлений.</p>
+<h3>Что делать при несправедливом наказании?</h3>
+<p>Подайте апелляцию или жалобу по установленной форме.</p>
+<p class="edit-note">✏️ Здесь можно добавлять свои вопросы и ответы.</p>
+</section>
+</main>
+
+<footer>© 2026 Black House · Официальный форум</footer>
+
+<div class="detailsPage" id="detailsPage">
+  <div class="detailsInner">
+    <button class="backBtn" onclick="closeSection()">← Назад</button>
+    <div id="detailsContent"></div>
+  </div>
+</div>
+
+<div class="modal" id="modal" onclick="if(event.target===this)closeProfile()">
+<div class="box"><h2>👤 Мой профиль</h2>
+<div class="field"><label>Аватар</label><img class="preview" id="preview"><input id="avatar" type="file" accept="image/*"></div>
+<div class="field"><label>Имя</label><input id="name" maxlength="30" placeholder="Твоё имя"></div>
+<div class="field"><label>О себе</label><textarea id="about" maxlength="200" placeholder="Расскажи о себе"></textarea></div>
+<div class="actions"><button class="cancel" onclick="closeProfile()">Отмена</button><button class="save" onclick="saveProfile()">Сохранить</button></div>
+</div></div>
+
+
+<div class="modal" id="adminLogin" onclick="if(event.target===this)closeAdminLogin()">
+<div class="box"><h2>🔐 Управление</h2>
+<div class="field"><label>Пароль владельца</label><input id="adminPassword" type="password" placeholder="Введите пароль" autocomplete="current-password"></div>
+<div class="actions"><button class="cancel" onclick="closeAdminLogin()">Отмена</button><button class="save" onclick="checkAdmin()">Войти</button></div>
+<p style="color:#888;font-size:12px;margin-bottom:0">Пароль можно изменить в коде сайта: ADMIN_PASSWORD.</p>
+</div></div>
+
+<div class="modal" id="adminPanelModal" onclick="if(event.target===this)closeAdmin()">
+<div class="box" style="width:min(650px,100%)"><h2>⚙️ Управление пользователями</h2>
+<p style="color:#aaa">Только владелец может менять имена и цвет отображения пользователей.</p>
+<div class="field"><label>Новый пользователь</label><input id="newUserName" maxlength="30" placeholder="Имя пользователя"></div>
+<div class="field"><label>Цвет имени</label><input id="newUserColor" class="colorInput" type="color" value="#e53935"></div>
+<div class="actions"><button class="save" onclick="addManagedUser()">Добавить</button></div>
+<div id="userList" class="adminPanel"></div>
+<div class="actions" style="margin-top:15px"><button class="cancel" onclick="closeAdmin()">Закрыть</button></div>
+</div></div>
+
+<script>
+function toggleMenu(){document.getElementById('mainMenu').classList.toggle('open')}
+function closeMenu(){document.getElementById('mainMenu').classList.remove('open')}
+</script>
+<script>
+const modalEl = document.getElementById('modal');
+const nameEl = document.getElementById('name');
+const aboutEl = document.getElementById('about');
+const avatarEl = document.getElementById('avatar');
+const previewEl = document.getElementById('preview');
+const profileEl = document.getElementById('profile');
+const pImgEl = document.getElementById('pImg');
+const pNameEl = document.getElementById('pName');
+const pAboutEl = document.getElementById('pAbout');
+const cornerEl = document.getElementById('cornerAvatar');
+
+const fallback='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(
+'<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="100%" height="100%" fill="#252932"/><text x="50%" y="58%" text-anchor="middle" font-size="80">👤</text></svg>'
+);
+let avatarData=null;
+
+function openProfile(){
+  let d={};
+  try{ d=JSON.parse(localStorage.getItem('bh_profile')||'{}'); }catch(e){}
+  nameEl.value=d.name||'';
+  aboutEl.value=d.about||'';
+  avatarData=d.avatar||null;
+  previewEl.src=avatarData||fallback;
+  modalEl.style.display='flex';
+}
+
+function closeProfile(){ modalEl.style.display='none'; }
+
+avatarEl.addEventListener('change',function(){
+  const file=this.files && this.files[0];
+  if(!file)return;
+  if(!file.type.startsWith('image/')){ alert('Выберите изображение.'); return; }
+  const reader=new FileReader();
+  reader.onload=function(e){
+    avatarData=e.target.result;
+    previewEl.src=avatarData;
+  };
+  reader.readAsDataURL(file);
+});
+
+function saveProfile(){
+  const data={
+    name:nameEl.value.trim()||'Игрок',
+    about:aboutEl.value.trim()||'О себе пока ничего не указано.',
+    avatar:avatarData||fallback
+  };
+  try{
+    localStorage.setItem('bh_profile',JSON.stringify(data));
+    renderProfile(data);
+    closeProfile();
+    alert('Профиль сохранён!');
+  }catch(e){
+    alert('Не удалось сохранить аватар. Попробуйте изображение меньшего размера.');
+  }
+}
+
+function renderProfile(data){
+  if(!data){
+    profileEl.classList.remove('show');
+    cornerEl.innerHTML='<span>👤</span>';
+    return;
+  }
+  profileEl.classList.add('show');
+  pImgEl.src=data.avatar||fallback;
+  pNameEl.textContent=data.name;
+  pAboutEl.textContent=data.about;
+
+  // Если для этого пользователя задан цвет в админ-панели,
+  // показываем его на имени профиля.
+  const managed=getManagedUsers().find(u => (u.name||'').trim().toLowerCase() === (data.name||'').trim().toLowerCase());
+  pNameEl.style.color = managed && managed.color ? managed.color : '';
+
+  cornerEl.innerHTML='';
+  const img=document.createElement('img');
+  img.src=data.avatar||fallback;
+  img.alt='Аватар';
+  cornerEl.appendChild(img);
+}
+
+function openSection(id){
+  const original=document.getElementById(id);
+  const page=document.getElementById('detailsPage');
+  const content=document.getElementById('detailsContent');
+  if(!original)return;
+  content.innerHTML='';
+  const clone=original.cloneNode(true);
+  clone.removeAttribute('id');
+  content.appendChild(clone);
+  page.style.display='block';
+  document.body.style.overflow='hidden';
+  window.scrollTo(0,0);
+}
+function closeSection(){
+  document.getElementById('detailsPage').style.display='none';
+  document.getElementById('detailsContent').innerHTML='';
+  document.body.style.overflow='';
+}
+
+const ADMIN_PASSWORD='Ara_2010';
+
+function openAdmin(){
+  const login=document.getElementById('adminLogin');
+  document.getElementById('adminPassword').value='';
+  login.style.display='flex';
+}
+function closeAdminLogin(){document.getElementById('adminLogin').style.display='none';}
+function openAdminPanel(){
+  if(sessionStorage.getItem('bh_admin')!=='1'){openAdmin();return;}
+  renderManagedUsers();
+  document.getElementById('adminPanelModal').style.display='flex';
+}
+function initAdminButton(){
+  const b=document.getElementById('ownerLoginBtn');
+  if(!b)return;
+  if(sessionStorage.getItem('bh_admin')==='1'){
+    b.textContent='⚙️ Управление';
+    b.onclick=function(){openAdminPanel();closeMenu();};
+  }
+}
+function checkAdmin(){
+  if(document.getElementById('adminPassword').value===ADMIN_PASSWORD){
+    sessionStorage.setItem('bh_admin','1');
+    closeAdminLogin();
+    document.getElementById('ownerLoginBtn').textContent='⚙️ Управление';
+    document.getElementById('ownerLoginBtn').onclick=function(){openAdminPanel();closeMenu();};
+    renderManagedUsers();
+    document.getElementById('adminPanelModal').style.display='flex';
+  }else{
+    alert('Неверный пароль.');
+  }
+}
+function closeAdmin(){document.getElementById('adminPanelModal').style.display='none';}
+
+function getManagedUsers(){
+  try{return JSON.parse(localStorage.getItem('bh_users')||'[]');}
+  catch(e){return [];}
+}
+function saveManagedUsers(users){
+  localStorage.setItem('bh_users',JSON.stringify(users));
+}
+function addManagedUser(){
+  const name=document.getElementById('newUserName').value.trim();
+  const color=document.getElementById('newUserColor').value;
+  if(!name){alert('Введите имя.');return;}
+  const users=getManagedUsers();
+  users.push({name,color});
+  saveManagedUsers(users);
+  document.getElementById('newUserName').value='';
+  renderManagedUsers();
+}
+function renderManagedUsers(){
+  const list=document.getElementById('userList');
+  const users=getManagedUsers();
+  if(!users.length){
+    list.innerHTML='<p style="color:#777">Пользователей пока нет.</p>';
+    return;
+  }
+  list.innerHTML='';
+  users.forEach((u,i)=>{
+    const row=document.createElement('div');
+    row.className='userRow';
+    row.innerHTML='<span class="userDot"></span><input maxlength="30"><input class="colorInput" type="color"><button class="smallBtn red">Удалить</button>';
+    const dot=row.querySelector('.userDot');
+    const name=row.querySelector('input');
+    const color=row.querySelector('.colorInput');
+    const del=row.querySelector('button');
+    name.value=u.name||'';
+    color.value=u.color||'#e53935';
+    dot.style.background=color.value;
+    color.addEventListener('input',()=>dot.style.background=color.value);
+    name.addEventListener('change',()=>{
+      users[i].name=name.value.trim()||u.name;
+      saveManagedUsers(users);
+      loadProfile();
+    });
+    color.addEventListener('change',()=>{
+      users[i].color=color.value;
+      saveManagedUsers(users);
+      loadProfile();
+    });
+    del.onclick=()=>{
+      users.splice(i,1);
+      saveManagedUsers(users);
+      renderManagedUsers();
+    };
+    list.appendChild(row);
+  });
+}
+
+
+function getSearchPlayers(){
+  const users=getManagedUsers();
+  let profile=null;
+  try{profile=JSON.parse(localStorage.getItem('bh_profile')||'null');}catch(e){}
+  const all=[...users];
+  if(profile && profile.name){
+    const exists=all.some(u=>(u.name||'').toLowerCase()===profile.name.toLowerCase());
+    if(!exists) all.unshift({name:profile.name,color:'#e53935',about:profile.about||'О себе пока ничего не указано.',avatar:profile.avatar||fallback});
+  }
+  return all;
+}
+function searchPlayers(){
+  const scope=document.getElementById('detailsContent');
+  const input=(scope&&scope.querySelector('#playerSearchInput'))||document.getElementById('playerSearchInput');
+  const results=(scope&&scope.querySelector('#searchResults'))||document.getElementById('searchResults');
+  if(!input||!results)return;
+  const q=input.value.trim().toLowerCase();
+  if(!q){results.innerHTML='<p class="emptySearch">Начните вводить никнейм.</p>';return;}
+  const found=getSearchPlayers().filter(u=>(u.name||'').toLowerCase().includes(q));
+  if(!found.length){results.innerHTML='<p class="emptySearch">Игрок не найден.</p>';return;}
+  results.innerHTML=found.map(u=>{
+    const avatar=u.avatar||fallback;
+    const color=u.color||'#e53935';
+    const about=u.about||'О себе пока ничего не указано.';
+    return '<div class="playerResult"><img src="'+avatar+'" alt="Аватар"><div class="playerInfo"><div class="playerName" style="color:'+color+'">'+escapeHtml(u.name||'Игрок')+'</div><div class="playerAbout">'+escapeHtml(about)+'</div></div></div>';
+  }).join('');
+}
+function escapeHtml(value){
+  return String(value).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c];});
+}
+
+function loadProfile(){
+  try{
+    const raw=localStorage.getItem('bh_profile');
+    renderProfile(raw?JSON.parse(raw):null);
+  }catch(e){ renderProfile(null); }
+}
+loadProfile();
+initAdminButton();
+</script>
+</body></html>
